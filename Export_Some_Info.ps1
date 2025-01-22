@@ -7,7 +7,7 @@ $pgport = "5432"
 $MSSQLServers = (Get-ADComputer -Filter * -SearchBase "OU=, OU=, DC=, DC=").name
 $PGServers = (Get-ADComputer -Filter 'Name -like "*SomePG*"' -SearchBase "OU=, OU=, DC=, DC=").Name
 [System.Reflection.Assembly]::LoadWithPartialName('Microsoft.SqlServer.SMO') | Out-Null
-$Results =  @{}
+$Results = @{}
 ForEach ($mssqlserver in $MSSQLServers) {
     $s = New-Object ('Microsoft.SqlServer.Management.Smo.Server') "$mssqlserver"
     foreach ($db in $s.Databases | Where-Object {$_.Name -ne 'msdb' -AND $_.Name -ne 'tempdb' -AND $_.Name-ne 'master' -AND $_.Name -ne 'model'}) {
@@ -45,12 +45,12 @@ ForEach ($pgserver in $PGServers) {
         $Results.Add("STC.$pgserver[$dbName]", $dsSTC)
     }
 }
-$ResultsFormatted = @()
+$ResultsFormatted = [PSCustomObject]@{}
 foreach ($Key in $Results.Keys | select-object name, {$_.Value.Tables.Rows.Count}) {
     $one = ($entry.Name.Split('.')[0]).Trim()
     $two = ($entry.Name.Split('.')[1]).Split('[')[0].Trim()
     $three = ($entry.Name.Split('.')[1]).Split('[')[1].Split(']')[0].Trim()
-    $ResultsFormatted = Add-Member -NotePropertyMembers @{
+    $ResultsFormatted | Add-Member -NotePropertyMembers @{
         Table = $one
         Server = $two
         Database = $three
