@@ -46,7 +46,8 @@ ForEach ($pgserver in $PGServers) {
     }
 }
 $ResultsFormatted = [PSCustomObject]@{}
-foreach ($Key in $Results.Keys | select-object name, {$_.Value.Tables.Rows.Count}) {
+foreach ($Key in $Results.Keys) {
+    $entry = $Results.$Key | select-object name, {$_.Value.Tables.Rows.Count}
     $one = ($entry.Name.Split('.')[0]).Trim()
     $two = ($entry.Name.Split('.')[1]).Split('[')[0].Trim()
     $three = ($entry.Name.Split('.')[1]).Split('[')[1].Split(']')[0].Trim()
